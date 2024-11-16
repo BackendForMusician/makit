@@ -15,9 +15,9 @@ public class EmailEntity {
 
     private String code;
 
-    private LocalDateTime expirationTime; // 인증번호 유효 시간
+    private LocalDateTime expirationTime;
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }

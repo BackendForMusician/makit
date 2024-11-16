@@ -14,12 +14,12 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
 
-    // 이메일 인증번호 전송 API
-    @PostMapping("/send")  // /api/email/send 경로로 POST 요청을 처리
+
+    @PostMapping("/send")
     public Map<String, String> sendVerificationCode(@RequestParam String email) {
         Map<String, String> response = new HashMap<>();
         try {
-            // 서비스 호출하여 인증번호 생성 및 전송
+
             emailService.sendVerificationEmail(email);
             response.put("message", "Verification email sent successfully.");
         } catch (Exception e) {
