@@ -62,6 +62,16 @@ public class EmailService {
         }
         return false;
     }
+    //인증 상태 확인
+
+    public boolean checkVerificationStatus(String email) {
+        EmailEntity emailEntity = emailRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("이메일을 찾을 수 없습니다."));
+
+        return emailEntity.isVerified();
+    }
+
+
 
     // 인증번호 재전송
     public void resendVerificationCode(String email) throws MessagingException {

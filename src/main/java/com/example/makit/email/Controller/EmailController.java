@@ -49,6 +49,25 @@ public class EmailController {
             return ResponseEntity.status(400).body(response);
         }
     }
+    // 인증 상태 확인. 프론트엔드에서 비밀번호 입력 페이지로 넘어가기 전에 /api/email/verify-status를 호출하여 인증 상태를 확인 가능
+    @GetMapping("/verify-status")
+    public ResponseEntity<Map<String, String>> checkVerificationStatus(@RequestParam String email) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            boolean isVerified = emailService.checkVerificationStatus(email);
+            if (isVerified) {
+                response.put("message", "이메일 인증이 완료되었습니다.");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "이메일 인증이 완료되지 않았습니다.");
+                return ResponseEntity.status(400).body(response);
+            }
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(400).body(response);
+        }
+    }
+
 
     // 인증번호 재전송
     @PostMapping("/resend")
