@@ -1,52 +1,34 @@
 package com.example.makit.email.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_verifications")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmailEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String code;
 
-    private LocalDateTime expirationTime;
+    @Column(nullable = false)
+    private LocalDateTime sentAt;
 
+    @Column(nullable = false)
+    private boolean verified;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public LocalDateTime getExpirationTime() {
-        return expirationTime;
-    }
-
-    public void setExpirationTime(LocalDateTime expirationTime) {
-        this.expirationTime = expirationTime;
-    }
+    @Column(nullable = true)
+    private LocalDateTime verifiedAt;
 }
