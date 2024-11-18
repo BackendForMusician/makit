@@ -22,8 +22,9 @@ public class UserEntity {
     private String email;         // 이메일
     private String password;      // 비밀번호
     private String nickname;      // 닉네임
+    private String phoneNumber;   // 전화번호
     private String selectedFields; // 선택한 분야
     private String selectedGenres; // 선택한 장르
 
-    // 필요한 다른 정보들을 여기에 추가할 수 있음
+    // 필요한 다른 정보들을 여기에 추가 예정
 }

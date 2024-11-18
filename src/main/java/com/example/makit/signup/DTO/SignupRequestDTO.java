@@ -10,4 +10,5 @@ public class SignupRequestDTO {
     private String nickname;
     private boolean isNicknameValid;   // 닉네임 유효성 검사 결과
 
+    private String phoneNumber;
 }

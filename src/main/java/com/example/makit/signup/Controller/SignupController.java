@@ -44,8 +44,6 @@ public class SignupController {
         boolean isNicknameValid = signupService.validateAndSaveNickname(nickname);
 
         if (isNicknameValid) {
-            session.setAttribute("nickname", nickname);
-            //위 메시지나
             return ResponseEntity.ok("닉네임이 유효합니다.");
         } else {
             return ResponseEntity.badRequest().body("닉네임은 2~20자의 대/소문자, 숫자, 특수문자만 허용됩니다.");
@@ -63,5 +61,31 @@ public class SignupController {
             return ResponseEntity.badRequest().body("세션에 닉네임이 없습니다. 저장 오류 발생입니다.");
         }
     }
+
+    //phonenumber 검사 api
+    @PostMapping("/phone-number")
+    public ResponseEntity<String> validatePhoneNumber(@RequestBody SignupRequestDTO request) {
+        String phoneNumber = request.getPhoneNumber();
+        boolean isPhoneNumberValid = signupService.validateAndSavePhoneNumber(phoneNumber);
+
+        if (isPhoneNumberValid) {
+            return ResponseEntity.ok("전화번호가 유효합니다.");
+        } else {
+            return ResponseEntity.badRequest().body("숫자만 입력.");
+        }
+    }
+
+    //postman에서 session에 저장되는 Phonenumber검사
+    @GetMapping("/session-phone-number")
+    public ResponseEntity<String> getSessionPhoneNumber(HttpSession session) {
+        String phoneNumber = (String) session.getAttribute("phoneNumber");
+        if (phoneNumber != null) {
+            return ResponseEntity.ok("세션에 저장된 전화번호: " + phoneNumber);
+        } else {
+            return ResponseEntity.badRequest().body("세션에 전화번호가 없습니다.");
+        }
+    }
+
+
 
 }

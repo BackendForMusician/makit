@@ -78,4 +78,15 @@ public class SignupService {
     }
 
 
+    //phone number part
+    // 전화번호 유효성 검사 및 세션 저장
+    public boolean validateAndSavePhoneNumber(String phoneNumber) {
+        // 유효성 검사: 숫자만 허용 + 길이 제한 (10~11자리)
+        if (phoneNumber != null && phoneNumber.matches("\\d{10,11}")) {
+            // 유효하다면 세션에 저장
+            session.setAttribute("phoneNumber", phoneNumber);
+            return true;
+        }
+        return false;
+    }
 }
