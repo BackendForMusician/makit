@@ -1,6 +1,7 @@
 package com.example.makit.signup.Service;
 
 import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.Validator.NicknameValidator;
 import com.example.makit.signup.Validator.PasswordValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SignupService {
+
+    //password part
 
     // 비밀번호 암호화를 위한 BCryptPasswordEncoder 객체 생성
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -61,4 +64,18 @@ public class SignupService {
 
         return response;
     }
+
+
+    //nickname part
+
+    public boolean validateAndSaveNickname(String nickname) {
+        if (NicknameValidator.isValidNickname(nickname)) {
+            // 유효하다면 세션에 저장
+            session.setAttribute("nickname", nickname);
+            return true;
+        }
+        return false;
+    }
+
+
 }
