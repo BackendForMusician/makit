@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 public class PasswordValidator {
 
+    //형식 정규식
     private static final String PASSWORD_REGEX =
             "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,16}$";
 

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SignupService {
@@ -22,13 +23,14 @@ public class SignupService {
     }
 
     // 비밀번호 유효성 검사 및 비밀번호 해싱
+    @Transactional
     public PasswordValidationResponse validatePasswords(SignupRequestDTO request) {
         String password = request.getPassword();
         String confirmPassword = request.getConfirmPassword();
 
         PasswordValidationResponse response = new PasswordValidationResponse();
 
-        // 비밀번호 형식 검증
+        // 비밀번호 형식 검증. figma에 따른 메세지 반환
         if (!PasswordValidator.isValidPassword(password)) {
             response.setIsPasswordValid(false); // 비밀번호 유효성 실패
             response.setPasswordErrorMessage("비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.");
@@ -51,6 +53,10 @@ public class SignupService {
 
             // 세션에 해싱된 비밀번호 저장 (임시 저장)
             session.setAttribute("hashedPassword", hashedPassword);
+
+            // 위에서 isPasswordValid, isPasswordMatch가 모두 true일 때 닉네임 페이지로 넘어갈 수 있다는 의미
+            // endpoint로 redirection 및 session의 password값 저장 유무를 통해 페이지 이동 가능
+            response.setRedirectToNicknamePage(true);
         }
 
         return response;

@@ -8,6 +8,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -19,7 +22,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final EmailRepository emailRepository;
 
-    // 인증번호 발송
+     //인증번호 발송
     public void sendVerificationEmail(String email) throws MessagingException {
         // 이미 인증된 이메일인 경우
         EmailEntity existingEmail = emailRepository.findByEmail(email).orElse(null);
@@ -43,7 +46,10 @@ public class EmailService {
         mailSender.send(message);
     }
 
+
+
     // 인증번호 검증
+    @Transactional
     public boolean validateVerificationCode(String email, String code) {
         EmailEntity emailEntity = emailRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("등록되지 않은 이메일입니다."));

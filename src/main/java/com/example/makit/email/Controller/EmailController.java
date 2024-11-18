@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,9 +17,11 @@ public class EmailController {
 
     private final EmailService emailService;
 
+
     // 인증번호 발송
     @PostMapping("/send")
     public ResponseEntity<Map<String, String>> sendVerificationCode(@RequestParam String email) {
+
         Map<String, String> response = new HashMap<>();
         try {
             emailService.sendVerificationEmail(email);
@@ -56,7 +59,9 @@ public class EmailController {
         try {
             boolean isVerified = emailService.checkVerificationStatus(email);
             if (isVerified) {
-                response.put("message", "이메일 인증이 완료되었습니다.");
+                response.put("message", "이메일 인증이 완료되었습니다.");;
+                //redirection하는 endpoint지정 필요
+                //혹은 session에 상태저장을 통해 프론트엔드 측에서 redirection 가능
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "이메일 인증이 완료되지 않았습니다.");
