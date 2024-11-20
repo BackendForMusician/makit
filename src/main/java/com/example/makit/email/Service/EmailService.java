@@ -34,7 +34,7 @@ public class EmailService {
 
         EmailEntity existingEmail = emailRepository.findByEmail(email).orElse(null);
         if (existingEmail != null && existingEmail.isVerified()) {
-            throw new RuntimeException("이미 가입된 이메일입니다.");  // 이메일 발송 안하고 에러 메시지 반환. 프론트에 넘겨줄 값
+            throw new CustomException("이미 가입된 이메일입니다.");  // 이메일 발송 안하고 에러 메시지 반환. 프론트에 넘겨줄 값
         }
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -44,14 +44,14 @@ public class EmailService {
             helper.setText("<p>인증 코드: <strong>" + code + "</strong></p>", true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 발송 실패");
+            throw new CustomException("이메일 발송 실패");
         }
     }
     @Async
     public void resendVerificationEmail(String email, String code) {
         EmailEntity existingEmail = emailRepository.findByEmail(email).orElse(null);
         if (existingEmail != null && existingEmail.isVerified()) {
-            throw new RuntimeException("이미 가입된 이메일 입니다.");  // 이메일 발송 안하고 에러 메시지 반환. 프론트에 넘겨줄 값
+            throw new CustomException("이미 가입된 이메일 입니다.");  // 이메일 발송 안하고 에러 메시지 반환. 프론트에 넘겨줄 값
         }
         try {
             // 새로운 인증 코드 발송
@@ -60,12 +60,9 @@ public class EmailService {
             helper.setTo(email);
             helper.setSubject("새로운 인증 코드");
             helper.setText("<p>새로운 인증 코드: <strong>" + code + "</strong></p>", true);
-
-            // 이메일 전송
             mailSender.send(message);
         } catch (MessagingException e) {
-            // 이메일 발송 실패 시 예외 처리
-            throw new RuntimeException("이메일 발송 실패");
+            throw new CustomException("이메일 발송 실패");
         }
     }
 }

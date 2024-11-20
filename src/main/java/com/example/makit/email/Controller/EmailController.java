@@ -26,6 +26,7 @@ public class EmailController {
     @PostMapping("/send")
     public ResponseEntity<EmailStatusResponseDTO> sendVerificationCode(
             @Valid @RequestBody EmailRequestDTO request, HttpSession session) {
+
         String email = request.getEmail();
         String authCode = emailService.generateVerificationCode();
 
@@ -43,7 +44,7 @@ public class EmailController {
                 false,    // 비밀번호 설정 단계 여부
                 false,    // 인증 완료 여부
                 true,    // 인증번호 틀림 여부. 초기에는 틀렸다고 설정
-                180       // 타이머: 3분(180초)
+                180       // 타이머: 3분(180초) 해당 값을 받아서 프론트에서 작업을 통해 잔여시간 보여줄 수 있음.
         ));
     }
 
@@ -66,37 +67,37 @@ public class EmailController {
             return ResponseEntity.status(400).body(response);
         }
 
+        // 인증시간이 초과된 경우 (3분 이상 경과)
+        if (System.currentTimeMillis() - timer > 180_000) { // 3분 제한
+            response.put("message", "인증 시간이 초과되었습니다.");
+            response.put("isAuthStep", true); // 인증 중
+            response.put("isAuthValid", false); // 인증 유효하지 않음
+            response.put("isAuthIncorrect", true); // 인증번호가 틀린 것처럼 처리
+            response.put("isPasswordStep", false); // 비밀번호 설정 단계로 못 넘어감
+            response.put("timer", 0);  // 인증시간이 초과되면 타이머는 0
+            return ResponseEntity.status(400).body(response);
+        }
+
         // 인증번호 및 시간 유효성 검사
         if (!email.equals(request.getEmail()) || !sessionAuthCode.equals(request.getAuthCode())) {
             response.put("message", "인증번호가 틀렸습니다.");
             session.setAttribute("isAuthValid", false); // 인증번호가 틀린 경우
-            response.put("isAuthStep", true); //인증 중
+            response.put("isAuthStep", true); // 인증 중
             response.put("isAuthValid", false);
-            response.put("isAuthIncorrect", true);
+            response.put("isAuthIncorrect", true); // 인증번호가 틀린 경우
             response.put("isPasswordStep", false);  // 비밀번호 설정 단계 아니므로 false
             response.put("timer", 180); // 남은 시간
             return ResponseEntity.status(400).body(response);
         }
 
-        // 인증시간이 초과된 경우
-        if (System.currentTimeMillis() - timer > 180_000) { // 3분 제한
-            response.put("message", "인증 시간이 초과되었습니다.");
-            response.put("isAuthStep", true); //인증 중
-            response.put("isAuthValid", false);
-            response.put("isAuthIncorrect", true);
-            response.put("isPasswordStep", false);  // 비밀번호 설정으로 넘어갈 수 없는 상황이기에 false
-            response.put("timer", 0);  // 인증시간이 초과되면 타이머는 0
-            return ResponseEntity.status(400).body(response);
-        }
-
         // 인증 성공
-        session.setAttribute("isAuthValid", true);
-        session.setAttribute("isPasswordStep", true);  // 인증 성공 후 비밀번호 설정 단계로 이동할 수 있도록 프론트엔드에게 반환
+        session.setAttribute("isAuthValid", true); // 인증 유효
+        session.setAttribute("isPasswordStep", true); // 비밀번호 설정 단계로 이동 가능
         response.put("message", "인증 성공");
         response.put("isAuthStep", false); // 인증 완료 후 인증 단계 종료
         response.put("isAuthValid", true);
-        response.put("isAuthIncorrect", false); //인증번호가 잘못되지 "않기에" false
-        response.put("isPasswordStep", true);  // 비밀번호 설정 단계로 이동할 수 있도록 명시
+        response.put("isAuthIncorrect", false); // 인증번호가 맞음
+        response.put("isPasswordStep", true);  // 비밀번호 설정 단계로 넘어갈 수 있도록 명시
         response.put("timer", 0);  // 인증이 완료되면 타이머는 0. 프론트엔드에서 처리하는 파트
         return ResponseEntity.ok(response);
     }
@@ -146,4 +147,3 @@ public class EmailController {
         return ResponseEntity.ok(sessionData);
     }
 }
-
