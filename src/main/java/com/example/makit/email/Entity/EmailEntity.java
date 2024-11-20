@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmailEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +30,5 @@ public class EmailEntity {
     @Column(nullable = false)
     private boolean verified;
 
-    @Column(nullable = true)
     private LocalDateTime verifiedAt;
 }
