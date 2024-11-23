@@ -1,6 +1,9 @@
 package com.example.makit.signup.Controller;
 
+import com.example.makit.signup.DTO.FieldsGenresResponseDTO;
 import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.Service.FieldService;
+import com.example.makit.signup.Service.GenreService;
 import com.example.makit.signup.Service.PasswordValidationResponse;
 import com.example.makit.signup.Service.SignupService;
 import jakarta.servlet.http.HttpSession;
@@ -8,12 +11,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/signup")
 @RequiredArgsConstructor
 public class SignupController {
 
     private final SignupService signupService;
+    private final FieldService fieldService;
+    private final GenreService genreService;
 
     // 비밀번호 입력 및 검증. /api/signup/password 요청에 대해 비밀번호 유효성 및 확인란 일치 여부를 검사하는 API
     @PostMapping("/password")
@@ -83,6 +90,31 @@ public class SignupController {
             return ResponseEntity.ok("세션에 저장된 전화번호: " + phoneNumber);
         } else {
             return ResponseEntity.badRequest().body("세션에 전화번호가 없습니다.");
+        }
+    }
+
+    // 전화번호 입력 후 분야와 장르 리스트를 반환하는 api
+    @GetMapping("/fields-genres")
+    public ResponseEntity<FieldsGenresResponseDTO> getAvailableFieldsAndGenres() {
+        // FieldService와 GenreService를 사용해 분야와 장르의 이름만 리스트로 가져옴
+        List<String> fields = fieldService.getAllFieldNames();
+        List<String> genres = genreService.getAllGenreNames();
+
+        FieldsGenresResponseDTO response = new FieldsGenresResponseDTO();
+        response.setFields(fields);
+        response.setGenres(genres);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 최종 회원가입 API - 분야와 장르를 선택하고 모든 회원가입 절차를 완료하는 API
+    @PostMapping("/complete")
+    public ResponseEntity<String> completeSignup(@RequestBody SignupRequestDTO request) {
+        boolean success = signupService.completeSignup(request.getSelectedFields(), request.getSelectedGenres());
+        if (success) {
+            return ResponseEntity.ok("회원가입이 완료되었습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("분야와 장르 선택이 유효하지 않습니다. 최소 1개, 최대 3개를 선택해주세요.");
         }
     }
 
