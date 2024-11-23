@@ -1,6 +1,8 @@
 package com.example.makit.signup.Service;
 
 import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.Entity.*;
+import com.example.makit.signup.Repository.*;
 import com.example.makit.signup.Validator.NicknameValidator;
 import com.example.makit.signup.Validator.PasswordValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class SignupService {
@@ -20,9 +24,23 @@ public class SignupService {
     // HttpSession 객체 주입 받기 (세션 관리)
     private final HttpSession session;
 
+    // 엔티티별 리포지토리
+    private final UserRepository userRepository;
+    private final FieldRepository fieldRepository;
+    private final GenreRepository genreRepository;
+    private final UserFieldRepository userFieldRepository;
+    private final UserGenreRepository userGenreRepository;
+
     // 생성자 주입을 통해 HttpSession 객체를 받을 수 있도록 설정
-    public SignupService(HttpSession session) {
+    public SignupService(HttpSession session, UserRepository userRepository, FieldRepository fieldRepository,
+                         GenreRepository genreRepository, UserFieldRepository userFieldRepository,
+                         UserGenreRepository userGenreRepository) {
         this.session = session;
+        this.userRepository = userRepository;
+        this.fieldRepository = fieldRepository;
+        this.genreRepository = genreRepository;
+        this.userFieldRepository = userFieldRepository;
+        this.userGenreRepository = userGenreRepository;
     }
 
     // 비밀번호 유효성 검사 및 비밀번호 해싱
@@ -88,5 +106,50 @@ public class SignupService {
             return true;
         }
         return false;
+    }
+
+    // 회원가입 완료 메서드
+    @Transactional
+    public boolean completeSignup(List<String> selectedFields, List<String> selectedGenres) {
+        // 1. 세션에서 사용자 정보 가져오기
+        String email = (String) session.getAttribute("email");
+        String hashedPassword = (String) session.getAttribute("hashedPassword");
+        String nickname = (String) session.getAttribute("nickname");
+        String phoneNumber = (String) session.getAttribute("phoneNumber");
+
+        // 2. 세션에 저장된 정보가 모두 존재하는지 확인
+        if (email == null || hashedPassword == null || nickname == null || phoneNumber == null) {
+            throw new IllegalStateException("세션에 저장된 회원 정보가 부족합니다.");
+        }
+
+        // 3. 사용자 엔티티 생성 및 저장
+        UserEntity user = new UserEntity();
+        user.setEmail(email);
+        user.setPassword(hashedPassword);
+        user.setNickname(nickname);
+        user.setPhoneNumber(phoneNumber);
+        userRepository.save(user);
+
+        // 4. 분야 정보 저장 (이름으로 조회)
+        for (String fieldName : selectedFields) {
+            FieldEntity field = fieldRepository.findByFieldName(fieldName)
+                    .orElseThrow(() -> new IllegalArgumentException("잘못된 분야 이름: " + fieldName));
+            UserField userField = new UserField();
+            userField.setUser(user);
+            userField.setField(field);
+            userFieldRepository.save(userField);
+        }
+
+        // 5. 장르 정보 저장 (이름으로 조회)
+        for (String genreName : selectedGenres) {
+            GenreEntity genre = genreRepository.findByGenreName(genreName)
+                    .orElseThrow(() -> new IllegalArgumentException("잘못된 장르 이름: " + genreName));
+            UserGenre userGenre = new UserGenre();
+            userGenre.setUser(user);
+            userGenre.setGenre(genre);
+            userGenreRepository.save(userGenre);
+        }
+
+        return true; // 회원가입 완료
     }
 }
