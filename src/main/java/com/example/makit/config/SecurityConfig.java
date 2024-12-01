@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 "/api/email/resend",
                                 "/api/email/validate",
                                 "/api/email/session",
+                                "/api/findid/**",
                                 "/api/signup/**",
                                 "/h2-console/**", // H2 콘솔 경로 허용 나중에 삭제
                                 "/api/login", // 로그인, 로그아웃
