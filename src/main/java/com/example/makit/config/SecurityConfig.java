@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/api/signup/**",
                                 "/h2-console/**", // H2 콘솔 경로 허용 나중에 삭제
                                 "/api/login", // 로그인, 로그아웃
-                                "/api/logout").permitAll()
+                                "/api/logout",
+                                "/api/email/send2").permitAll()
                                                 .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 .headers(headers -> headers
