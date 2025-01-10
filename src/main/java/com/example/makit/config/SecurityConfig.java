@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/email/send",
                                 "/api/email/resend",
+                                "/api/reset/**",
                                 "/api/email/validate",
                                 "/api/email/session",
                                 "/api/findid/**",

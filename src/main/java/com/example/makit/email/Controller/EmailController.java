@@ -149,56 +149,5 @@ public class EmailController {
     }
 
     // 이메일 인증번호 발송
-    @PostMapping("/send2")
-    public ResponseEntity<EmailStatusResponseDTO> sendVerificationCode2(
-            @Valid @RequestBody EmailRequestDTO request, HttpSession session) {
 
-        String email = request.getEmail();
-        try {
-            CompletableFuture<Boolean> future = emailService.checkEmailExists(email);
-            boolean exists = future.get();
-
-            if (exists) {
-                String authCode = emailService.generateVerificationCode();
-
-                // 세션에 이메일, 인증번호, 인증시간 저장. 유효시간 초과 및 인증번호 일치여부 검사하기 위함
-                session.setAttribute("email", email);
-                session.setAttribute("authCode", authCode);
-                session.setAttribute("timer", System.currentTimeMillis());
-
-                emailService.sendVerificationEmail(email, authCode);
-
-                // 초기 인증 상태 전달
-                return ResponseEntity.ok(new EmailStatusResponseDTO(
-                        true,     // 이메일 유효성 검사 상태
-                        true,     // 인증 단계 여부 (현재 인증 단계임)
-                        false,    // 비밀번호 설정 단계 여부
-                        false,    // 인증 완료 여부
-                        true,    // 인증번호 틀림 여부. 초기에는 틀렸다고 설정
-                        180       // 타이머: 3분(180초) 해당 값을 받아서 프론트에서 작업을 통해 잔여시간 보여줄 수 있음.
-                ));
-            } else {
-                return ResponseEntity.status(400).body(new EmailStatusResponseDTO(
-                        false,    // 이메일 유효성
-                        false,    // 인증 단계
-                        false,    // 비밀번호 단계
-                        false,    // 인증 성공 여부
-                        true,    // 인증번호 틀림 여부
-                        0         // 타이머
-                ));
-
-            }
-        } catch (Exception e) { //오류 체크용
-            return ResponseEntity.status(400).body(new EmailStatusResponseDTO(
-                    false,    // 이메일 유효성
-                    false,    // 인증 단계
-                    false,    // 비밀번호 단계
-                    false,    // 인증 성공 여부
-                    true,    // 인증번호 틀림 여부
-                    4         // 타이머
-            ));
-        }
-
-
-    }
 }
