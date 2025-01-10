@@ -2,6 +2,8 @@ package com.example.makit.resetPassword.Controller;
 
 import com.example.makit.email.Dto.EmailRequestDTO;
 import com.example.makit.resetPassword.Service.ResetPasswordService;
+import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.Service.PasswordValidationResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,5 +48,25 @@ public class ResetPasswordController {
         } else {
             return ResponseEntity.status(400).body("링크가 유효하지 않거나 만료되었습니다.");
         }
+    }
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<String> updatePassword(@RequestBody SignupRequestDTO request, @RequestParam String email, @RequestParam String link) {
+        boolean isValid = resetPasswordService.validateResetLink(email, link);
+        if (!isValid) {
+            return ResponseEntity.status(400).body("링크가 유효하지 않거나 만료되었습니다.");
+        }
+
+        PasswordValidationResponse response = resetPasswordService.validateAndUpdatePassword(email, request);
+
+        if (!response.isPasswordValid()) {
+            return ResponseEntity.badRequest().body(response.getPasswordErrorMessage());
+        }
+
+        if (!response.isPasswordMatch()) {
+            return ResponseEntity.badRequest().body(response.getPasswordMatchErrorMessage());
+        }
+
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 }
