@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "USER_ENTITY")
 public class UserEntity {
 
     @Id
