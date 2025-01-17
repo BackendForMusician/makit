@@ -22,6 +22,7 @@ public class UserEntity {
     private String password;      // 비밀번호
     private String nickname;      // 닉네임
     private String phoneNumber;   // 전화번호
+    private String userType = "USER"; //유저 권한
 
     @OneToMany(mappedBy = "user")
     private Set<UserField> userFields = new HashSet<>(); // 선택한 분야
