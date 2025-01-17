@@ -2,6 +2,7 @@ package com.example.makit.signup.Controller;
 
 import com.example.makit.signup.DTO.FieldsGenresResponseDTO;
 import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.DTO.TermsAgreementRequest;
 import com.example.makit.signup.Service.FieldService;
 import com.example.makit.signup.Service.GenreService;
 import com.example.makit.signup.Service.PasswordValidationResponse;
@@ -9,9 +10,13 @@ import com.example.makit.signup.Service.SignupService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/signup")
@@ -21,6 +26,29 @@ public class SignupController {
     private final SignupService signupService;
     private final FieldService fieldService;
     private final GenreService genreService;
+
+    @PostMapping("/terms")
+    public ResponseEntity<Map<String, Object>> agreeToTerms(@Validated @RequestBody TermsAgreementRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 필수 항목 검사
+        List<String> missingTerms = new ArrayList<>();
+        if (!request.getIsOver14()) missingTerms.add("isOver14");
+        if (!request.getTermsOfService()) missingTerms.add("termsOfService");
+        if (!request.getPrivacyConsent()) missingTerms.add("privacyConsent");
+        if (!request.getPrivacyPolicy()) missingTerms.add("privacyPolicy");
+
+        if (!missingTerms.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "You must agree to all required terms to proceed.");
+            response.put("missingTerms", missingTerms);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        response.put("success", true);
+        response.put("message", "동의 완료");
+        return ResponseEntity.ok(response);
+    }
 
     // 비밀번호 입력 및 검증. /api/signup/password 요청에 대해 비밀번호 유효성 및 확인란 일치 여부를 검사하는 API
     @PostMapping("/password")
@@ -109,9 +137,11 @@ public class SignupController {
 
     // 최종 회원가입 API - 분야와 장르를 선택하고 모든 회원가입 절차를 완료하는 API
     @PostMapping("/complete")
-    public ResponseEntity<String> completeSignup(@RequestBody SignupRequestDTO request) {
+    public ResponseEntity<String> completeSignup(HttpSession session, @RequestBody SignupRequestDTO request) {
         boolean success = signupService.completeSignup(request.getSelectedFields(), request.getSelectedGenres());
         if (success) {
+            // 회원가입 완료 후 세션 초기화
+            session.invalidate();
             return ResponseEntity.ok("회원가입이 완료되었습니다.");
         } else {
             return ResponseEntity.badRequest().body("분야와 장르 선택이 유효하지 않습니다. 최소 1개, 최대 3개를 선택해주세요.");
