@@ -35,12 +35,10 @@ public class LoginController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false); // 세션이 없으면 null 반환
-        if (session != null) {
-            session.invalidate(); // 세션 무효화
-        }
-        return ResponseEntity.ok("Logout successful");
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        session.invalidate(); // 세션 무효화
+        return ResponseEntity.ok("Logout successful.");
     }
 
     @GetMapping("/check")
