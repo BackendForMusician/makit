@@ -7,17 +7,12 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class FeedEntity {
-
+@Table(name = "tags")
+public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-    private String description;
-    private String audioUrl;
-    private String imageUrl;
-
-    @Lob
-    private String tags;
+    @Column(unique = true, nullable = false)
+    private String name;
 }

@@ -1,9 +1,10 @@
 package com.example.makit.feedUpload.Repository;
 
-import com.example.makit.feedUpload.Entity.FeedEntity;
+import com.example.makit.feedUpload.Entity.TagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FeedRepository extends JpaRepository<FeedEntity, Long> {
+public interface TagRepository extends JpaRepository<TagEntity, Long> {
+    TagEntity findByName(String name);
 }

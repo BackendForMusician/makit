@@ -20,21 +20,29 @@ public class FeedUploadService {
     private final AmazonS3 amazonS3;
     private final FeedRepository feedRepository;
 
+
     private static final List<String> SUPPORTED_AUDIO_TYPES = Arrays.asList("audio/mpeg", "audio/wav", "audio/aac", "audio/flac");
     private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/raw");
+
+
+    private static final long MAX_AUDIO_SIZE = 50 * 1024 * 1024; // 50MB
+    private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
     public FeedUploadService(AmazonS3 amazonS3, FeedRepository feedRepository) {
         this.amazonS3 = amazonS3;
         this.feedRepository = feedRepository;
     }
 
+
     public boolean isValidAudioFile(MultipartFile file) {
-        return file.getSize() <= 100 * 1024 * 1024 && SUPPORTED_AUDIO_TYPES.contains(file.getContentType());
+        return file.getSize() <= MAX_AUDIO_SIZE && SUPPORTED_AUDIO_TYPES.contains(file.getContentType());
     }
 
+
     public boolean isValidImageFile(MultipartFile file) {
-        return file.getSize() <= 10 * 1024 * 1024 && SUPPORTED_IMAGE_TYPES.contains(file.getContentType());
+        return file.getSize() <= MAX_IMAGE_SIZE && SUPPORTED_IMAGE_TYPES.contains(file.getContentType());
     }
+
 
     public String uploadFileToS3(MultipartFile file, String folder) {
         String fileName = folder + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
@@ -43,13 +51,14 @@ public class FeedUploadService {
         metadata.setContentLength(file.getSize());
 
         try (InputStream inputStream = file.getInputStream()) {
-            amazonS3.putObject("your-bucket-name", fileName, inputStream, metadata);
+            amazonS3.putObject("my-audio-image-bucket", fileName, inputStream, metadata);
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
 
-        return amazonS3.getUrl("your-bucket-name", fileName).toString();
+        return amazonS3.getUrl("my-audio-image-bucket", fileName).toString();
     }
+
 
     public void saveFeed(FeedUploadRequestDTO request) {
         FeedEntity feed = new FeedEntity();

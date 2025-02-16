@@ -13,4 +13,8 @@ public class FeedUploadRequestDTO {
     private String audioUrl;
     private String imageUrl;
     private List<String> tags;
+
+    public boolean isValidTagCount() {
+        return tags != null && tags.size() <= 3;
+    }
 }
