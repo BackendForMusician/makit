@@ -10,12 +10,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class UserProfileService {
 
     private final UserProfileImageRepository repository;
+
+    // 지원하는 이미지 MIME 타입 목록
+    private static final List<String> SUPPORTED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/raw");
 
     public UserProfileService(UserProfileImageRepository repository) {
         this.repository = repository;
@@ -28,9 +33,9 @@ public class UserProfileService {
             throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
         }
 
-        // 2. 확장자 검사
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null || !isValidExtension(originalFilename)) {
+        // 2. MIME 타입 검사
+        String contentType = file.getContentType();
+        if (contentType == null || !SUPPORTED_IMAGE_TYPES.contains(contentType)) {
             throw new IllegalArgumentException("허용되지 않은 파일 형식입니다. (JPG, PNG, RAW만 허용)");
         }
 
@@ -67,14 +72,5 @@ public class UserProfileService {
         profileImage.setUrl(resizedFile.getPath()); // 상대 경로 저장
         profileImage.setCreatedAt(LocalDate.now());
         return repository.save(profileImage);
-    }
-
-    // 파일 확장자 유효성 검사
-    private boolean isValidExtension(String filename) {
-        String lowerCaseFilename = filename.toLowerCase();
-        return lowerCaseFilename.endsWith(".jpg") ||
-               lowerCaseFilename.endsWith(".jpeg") ||
-               lowerCaseFilename.endsWith(".png") ||
-               lowerCaseFilename.endsWith(".raw");
     }
 }
