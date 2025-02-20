@@ -3,6 +3,8 @@ package com.example.makit.config;
 import com.example.makit.login.Interceptor.AuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -16,6 +18,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.defaultContentType(MediaType.MULTIPART_FORM_DATA);
+    }
+
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor) // 인터셉터 등록
                 .addPathPatterns("/api/auth/logout")
