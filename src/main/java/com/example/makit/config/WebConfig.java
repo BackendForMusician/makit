@@ -17,10 +17,10 @@ public class WebConfig implements WebMvcConfigurer {
         this.authInterceptor = authInterceptor;
     }
 
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.defaultContentType(MediaType.MULTIPART_FORM_DATA);
-    }
+//    @Override
+//    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+//        configurer.defaultContentType(MediaType.MULTIPART_FORM_DATA);
+//    }
 
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor) // 인터셉터 등록
