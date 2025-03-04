@@ -148,13 +148,16 @@ public class SignupController {
     // 최종 회원가입 API - 분야와 장르를 선택하고 모든 회원가입 절차를 완료하는 API
     @PostMapping("/complete")
     public ResponseEntity<String> completeSignup(HttpSession session, @RequestBody SignupRequestDTO request) {
-        boolean success = signupService.completeSignup(request.getSelectedFields(), request.getSelectedGenres());
-        if (success) {
-            // 회원가입 완료 후 세션 초기화
-            session.invalidate();
-            return ResponseEntity.ok("회원가입이 완료되었습니다.");
-        } else {
-            return ResponseEntity.badRequest().body("분야와 장르 선택이 유효하지 않습니다. 최소 1개, 최대 3개를 선택해주세요.");
+        try {
+            boolean success = signupService.completeSignup(request.getSelectedFields(), request.getSelectedGenres());
+            if (success) {
+                session.invalidate();
+                return ResponseEntity.ok("회원가입이 완료되었습니다.");
+            } else {
+                return ResponseEntity.badRequest().body("분야와 장르 선택이 유효하지 않습니다. 최소 1개, 최대 3개를 선택해주세요.");
+            }
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage()); // 예외 발생 시 400 응답과 메시지 반환
         }
     }
 
