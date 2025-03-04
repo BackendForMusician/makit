@@ -1,6 +1,8 @@
 package com.example.makit.signup.Service;
 
 import com.example.makit.signup.DTO.SignupRequestDTO;
+import com.example.makit.signup.DTO.TermsAgreement;
+import com.example.makit.signup.DTO.TermsAgreementRequest;
 import com.example.makit.signup.Entity.*;
 import com.example.makit.signup.Repository.*;
 import com.example.makit.signup.Validator.NicknameValidator;
@@ -116,11 +118,13 @@ public class SignupService {
         String hashedPassword = (String) session.getAttribute("hashedPassword");
         String nickname = (String) session.getAttribute("nickname");
         String phoneNumber = (String) session.getAttribute("phoneNumber");
-
+        TermsAgreementRequest termsRequest =
+                (TermsAgreementRequest) session.getAttribute("termsAgreement");
         // 2. 세션에 저장된 정보가 모두 존재하는지 확인
         if (email == null || hashedPassword == null || nickname == null || phoneNumber == null) {
             throw new IllegalStateException("세션에 저장된 회원 정보가 부족합니다.");
-        }
+        };
+
 
         // 3. 사용자 엔티티 생성 및 저장
         UserEntity user = new UserEntity();
@@ -128,6 +132,20 @@ public class SignupService {
         user.setPassword(hashedPassword);
         user.setNickname(nickname);
         user.setPhoneNumber(phoneNumber);
+
+        if (termsRequest != null) {
+            TermsAgreement agreement = new TermsAgreement(
+                    termsRequest.getIsOver14(),
+                    termsRequest.getTermsOfService(),
+                    termsRequest.getPrivacyConsent(),
+                    termsRequest.getPrivacyPolicy(),
+                    termsRequest.getOptionalPrivacyConsent()
+            );
+
+            user.setTermsAgreement(agreement);
+        }
+
+
         userRepository.save(user);
 
         // 4. 분야 정보 저장 (이름으로 조회)

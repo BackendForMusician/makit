@@ -1,4 +1,4 @@
-package com.example.makit.track.dto;
+package com.example.makit.trackUpload.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

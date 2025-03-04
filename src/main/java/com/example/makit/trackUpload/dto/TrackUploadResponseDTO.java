@@ -1,4 +1,4 @@
-package com.example.makit.track.dto;
+package com.example.makit.trackUpload.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

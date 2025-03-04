@@ -1,6 +1,6 @@
-package com.example.makit.track.repository;
+package com.example.makit.trackUpload.repository;
 
-import com.example.makit.track.entity.Track;
+import com.example.makit.trackUpload.entity.Track;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

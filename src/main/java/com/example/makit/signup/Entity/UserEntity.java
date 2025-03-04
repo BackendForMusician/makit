@@ -1,5 +1,7 @@
 package com.example.makit.signup.Entity;
 
+import com.example.makit.signup.Converter.TermsAgreementConverter;
+import com.example.makit.signup.DTO.TermsAgreement;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,10 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private Set<UserGenre> userGenres = new HashSet<>(); // 선택한 장르
+
+    @Convert(converter = TermsAgreementConverter.class)
+    @Column(name = "terms_agreement_json", columnDefinition = "TEXT")
+    private TermsAgreement termsAgreement;
 
     // 필요한 다른 정보들을 여기에 추가 예정
 }

@@ -1,6 +1,5 @@
-package com.example.makit.track.entity;
+package com.example.makit.feedUpload.Entity;
 
-import com.example.makit.feedUpload.Entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,14 +9,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-public class TrackTag {
+public class FeedTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "track_id")
-    private Track track;
+    @JoinColumn(name = "feed_id")
+    private FeedEntity feed;
 
     @ManyToOne
     @JoinColumn(name = "tag_id")

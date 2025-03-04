@@ -28,7 +28,7 @@ public class SignupController {
     private final GenreService genreService;
 
     @PostMapping("/terms")
-    public ResponseEntity<Map<String, Object>> agreeToTerms(@Validated @RequestBody TermsAgreementRequest request) {
+    public ResponseEntity<Map<String, Object>> agreeToTerms(@Validated @RequestBody TermsAgreementRequest request, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         // 필수 항목 검사
@@ -44,10 +44,20 @@ public class SignupController {
             response.put("missingTerms", missingTerms);
             return ResponseEntity.badRequest().body(response);
         }
-
+        session.setAttribute("termsAgreement", request);
         response.put("success", true);
         response.put("message", "동의 완료");
         return ResponseEntity.ok(response);
+    }
+    // 세션에서 약관 동의 내역 확인. 포스트맨에서 검사를 위함
+    @GetMapping("/session-agree")
+    public ResponseEntity<?> getSessionAgreement(HttpSession session) {
+        TermsAgreementRequest agreement = (TermsAgreementRequest) session.getAttribute("termsAgreement");
+        if (agreement != null) {
+            return ResponseEntity.ok(agreement);
+        } else {
+            return ResponseEntity.badRequest().body("세션에 동의 내역이 없습니다.");
+        }
     }
 
     // 비밀번호 입력 및 검증. /api/signup/password 요청에 대해 비밀번호 유효성 및 확인란 일치 여부를 검사하는 API

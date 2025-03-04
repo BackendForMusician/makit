@@ -1,10 +1,22 @@
-package com.example.makit.track.service;
+package com.example.makit.trackUpload.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.makit.track.dto.TrackUploadRequestDTO;
-import com.example.makit.track.entity.Track;
-import com.example.makit.track.repository.TrackRepository;
+import com.example.makit.exception.GenreNotFoundException;
+import com.example.makit.exception.TagNotFoundException;
+import com.example.makit.feedUpload.Entity.TagEntity;
+import com.example.makit.feedUpload.Repository.TagRepository;
+import com.example.makit.signup.Entity.GenreEntity;
+import com.example.makit.signup.Entity.UserEntity;
+import com.example.makit.signup.Repository.GenreRepository;
+import com.example.makit.trackUpload.dto.TrackUploadRequestDTO;
+import com.example.makit.trackUpload.entity.Track;
+import com.example.makit.trackUpload.entity.TrackGenre;
+import com.example.makit.trackUpload.entity.TrackTag;
+import com.example.makit.trackUpload.repository.TrackGenreRepository;
+import com.example.makit.trackUpload.repository.TrackRepository;
+import com.example.makit.trackUpload.repository.TrackTagRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,13 +24,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TrackService {
 
     private final TrackRepository trackRepository;
+    private final GenreRepository genreRepository;
+    private final TagRepository tagRepository;
+    private final TrackGenreRepository trackGenreRepository;
+    private final TrackTagRepository trackTagRepository;
     private final AmazonS3 amazonS3;
 
     // 허용되는 확장자
@@ -38,29 +56,48 @@ public class TrackService {
             "image/jpg"
     );
 
-    public Track uploadTrackWithFiles(TrackUploadRequestDTO request,
+    @Transactional
+    public void uploadTrackWithFiles(TrackUploadRequestDTO request,
                                       MultipartFile audioFile,
-                                      MultipartFile imageFile) {
+                                      MultipartFile imageFile,
+                                      UserEntity loginMember) {
+
         // 1) 파일 확장자 + MIME 타입 검증
         validateAudioFile(audioFile);
         validateImageFile(imageFile);
-        // 2) S3 업로드 (아래는 예시 - 실제로는 s3Uploader 같은 유틸 클래스를 따로 두는 경우가 많음)
+
+
+        // 2) S3 업로드
         String audioUrl = uploadFile(audioFile, "trackAudio");
         String imageUrl = uploadFile(imageFile, "trackImage");
 
         // 3) DB 저장
         Track track = new Track();
         track.setTitle(request.getTitle());
+        track.setLyrics(request.getLyrics());
         track.setDescription(request.getDescription());
         track.setAudioUrl(audioUrl);
         track.setImageUrl(imageUrl);
+        track.setUser(loginMember);
+        trackRepository.save(track);
+
+        // 장르 및 태그 설정 (오류 발생 시 롤백)
+        Set<TrackGenre> trackGenres = request.getGenres().stream()
+                .map(genreName -> createTrackGenre(track, genreName))
+                .collect(Collectors.toSet());
+
+        Set<TrackTag> trackTags = request.getTags().stream()
+                .map(tagName -> createTrackTag(track, tagName))
+                .collect(Collectors.toSet());
+
+        // TrackGenre, TrackTag 저장
+        trackGenreRepository.saveAll(trackGenres);
+        trackTagRepository.saveAll(trackTags);
         // 필요한 필드들 설정 (장르, 태그 등)
-        return trackRepository.save(track);
+
     }
 
-    /**
-     * 오디오 파일 (확장자 + MIME) 검증
-     */
+
     private void validateAudioFile(MultipartFile audioFile) {
         String originalFilename = audioFile.getOriginalFilename();
         String ext = getExtension(originalFilename).toLowerCase();
@@ -101,7 +138,7 @@ public class TrackService {
     }
 
     private String uploadFile(MultipartFile file, String folder) {
-        String fileName = folder + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String fileName = "track/"+folder + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
@@ -113,5 +150,25 @@ public class TrackService {
         }
 
         return amazonS3.getUrl("my-audio-image-bucket", fileName).toString();
+    }
+
+    private TrackGenre createTrackGenre(Track track, String genreName) {
+        GenreEntity genre = genreRepository.findByGenreName(genreName)
+                .orElseThrow(() -> new GenreNotFoundException(genreName));
+
+        TrackGenre trackGenre = new TrackGenre();
+        trackGenre.setTrack(track);
+        trackGenre.setGenre(genre);
+        return trackGenre;
+    }
+
+    private TrackTag createTrackTag(Track track, String tagName) {
+        TagEntity tag = tagRepository.findByName(tagName)
+                .orElseThrow(() -> new TagNotFoundException(tagName));
+
+        TrackTag trackTag = new TrackTag();
+        trackTag.setTrack(track);
+        trackTag.setTag(tag);
+        return trackTag;
     }
 }

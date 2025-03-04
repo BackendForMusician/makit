@@ -1,6 +1,9 @@
 package com.example.makit.signup.DTO;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
 
 public class TermsAgreementRequest {
 

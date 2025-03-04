@@ -1,5 +1,7 @@
 package com.example.makit.setup;
 
+import com.example.makit.exception.GenreNotFoundException;
+import com.example.makit.signup.DTO.TermsAgreement;
 import com.example.makit.signup.Entity.*;
 import com.example.makit.signup.Repository.*;
 import jakarta.transaction.Transactional;
@@ -11,8 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-// git ignore <-- 합의되지 않은 픽스쳐가 존재한다
-// 다른 팀원이 -> 이거 왜있음? 궁금해하고 찾게됨 -> 이거 시간낭비
+
 @Component
 @RequiredArgsConstructor
 public class TestProfileSetting_By_ApplicationRunner implements ApplicationRunner {
@@ -53,6 +54,9 @@ public class TestProfileSetting_By_ApplicationRunner implements ApplicationRunne
         user.setPassword(passwordEncoder.encode("test1995@"));
         user.setNickname("테스트유저1");
         user.setPhoneNumber("010-1234-5678");
+        user.setUserType("USER");
+        TermsAgreement termsAgreement = new TermsAgreement(true,true,true,true,true);
+        user.setTermsAgreement(termsAgreement);
         userRepository.save(user);
 
 
@@ -63,7 +67,7 @@ public class TestProfileSetting_By_ApplicationRunner implements ApplicationRunne
         userField.setField(field);
         userFieldRepository.save(userField);
 
-        GenreEntity genre = genreRepository.findByGenreName("팝").orElseThrow(() -> new RuntimeException("Genre not found"));
+        GenreEntity genre = genreRepository.findByGenreName("팝").orElseThrow(() -> new GenreNotFoundException("팝"));
 
         UserGenre userGenre = new UserGenre();
         userGenre.setGenre(genre);

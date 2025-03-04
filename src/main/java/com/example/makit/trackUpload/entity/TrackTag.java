@@ -1,6 +1,6 @@
-package com.example.makit.track.entity;
+package com.example.makit.trackUpload.entity;
 
-import com.example.makit.signup.Entity.GenreEntity;
+import com.example.makit.feedUpload.Entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-public class TrackGenre {
+public class TrackTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +20,6 @@ public class TrackGenre {
     private Track track;
 
     @ManyToOne
-    @JoinColumn(name = "genre_id")
-    private GenreEntity genre;
+    @JoinColumn(name = "tag_id")
+    private TagEntity tag;
 }

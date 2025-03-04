@@ -1,9 +1,12 @@
-package com.example.makit.track.controller;
+package com.example.makit.trackUpload.controller;
 
-import com.example.makit.track.dto.TrackUploadRequestDTO;
-import com.example.makit.track.dto.TrackUploadResponseDTO;
-import com.example.makit.track.entity.Track;
-import com.example.makit.track.service.TrackService;
+import com.example.makit.login.Util.SessionUtil;
+import com.example.makit.signup.Entity.UserEntity;
+import com.example.makit.trackUpload.dto.TrackUploadRequestDTO;
+import com.example.makit.trackUpload.dto.TrackUploadResponseDTO;
+import com.example.makit.trackUpload.entity.Track;
+import com.example.makit.trackUpload.service.TrackService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -12,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,8 +30,14 @@ public class TrackController {
             @Valid @RequestPart(value = "request") TrackUploadRequestDTO request,
             BindingResult bindingResult,
             @RequestPart(value = "audioFile", required = false) MultipartFile audioFile,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
-            ) { //TODO JSON 변경, 세션에서 Member 객체 뽑아오기, 저장 및 테스트
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            HttpServletRequest httpRequest
+            ) {
+        // 세션에서 로그인한 사용자 가져오기
+        UserEntity loginMember = SessionUtil.getUserFromSession(httpRequest.getSession(false));
+        if (loginMember == null) {
+            return ResponseEntity.status(401).body(new TrackUploadResponseDTO(false, "로그인이 필요합니다."));
+        }
 
         // DTO 유효성 검증 에러 처리
         if (bindingResult.hasErrors()) {
@@ -59,7 +67,7 @@ public class TrackController {
 
         try {
             // Track 엔티티(또는 저장 결과 DTO 등) 리턴 가정
-            Track savedTrack = trackService.uploadTrackWithFiles(request, audioFile, imageFile);
+            trackService.uploadTrackWithFiles(request, audioFile, imageFile, loginMember);
             return ResponseEntity.ok(new TrackUploadResponseDTO(true,"성공"));
         } catch (IllegalArgumentException e) {
           // 확장자 검증 실패 등

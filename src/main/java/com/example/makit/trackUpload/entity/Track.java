@@ -1,6 +1,5 @@
-package com.example.makit.track.entity;
+package com.example.makit.trackUpload.entity;
 
-import com.example.makit.feedUpload.Entity.TagEntity;
 import com.example.makit.signup.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,7 +22,9 @@ public class Track {
     private String title;
     private String lyrics;
     private String description;
+    @Column(length = 2000)
     private String audioUrl;
+    @Column(length = 2000)
     private String imageUrl;
 
 

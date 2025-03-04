@@ -26,7 +26,7 @@ public class TagService {
         );
 
         for (String tagName : predefinedTags) {
-            if (tagRepository.findByName(tagName) == null) {
+            if (tagRepository.findByName(tagName).isEmpty()) {
                 TagEntity tag = new TagEntity();
                 tag.setName(tagName);
                 tagRepository.save(tag);
