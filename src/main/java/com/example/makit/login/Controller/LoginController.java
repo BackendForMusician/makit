@@ -31,7 +31,7 @@ public class LoginController {
                     SessionUtil.saveUserToSession(newSession, user);
                     return ResponseEntity.ok("Login successful");
                 })
-                .orElse(ResponseEntity.status(401).body("Invalid credentials"));
+                .orElse(ResponseEntity.badRequest().body("Invalid credentials"));
     }
 
     @PostMapping("/logout")
@@ -45,7 +45,7 @@ public class LoginController {
     public ResponseEntity<?> checkSession(HttpServletRequest request) {
         UserEntity loginMember = SessionUtil.getUserFromSession(request.getSession(false));
         if (loginMember == null) {
-            return ResponseEntity.status(401).body("Not logged in");
+            return ResponseEntity.badRequest().body("Not logged in");
         }
         return ResponseEntity.ok("Logged in as: " + loginMember.getEmail());
     }

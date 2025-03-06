@@ -9,6 +9,7 @@ import com.example.makit.trackUpload.service.TrackService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/tracks")
 @RequiredArgsConstructor
@@ -74,6 +75,7 @@ public class TrackController {
           return ResponseEntity.badRequest().body(new TrackUploadResponseDTO(false,e.getMessage()));
         } catch (Exception e) {
           // 기타 예외
+            log.error(e.getMessage());
            return ResponseEntity.internalServerError().body(new TrackUploadResponseDTO(false,"서버 오류가 발생했습니다."));
         }
 

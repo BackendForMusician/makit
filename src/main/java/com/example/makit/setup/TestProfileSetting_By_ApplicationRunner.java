@@ -73,6 +73,31 @@ public class TestProfileSetting_By_ApplicationRunner implements ApplicationRunne
         userGenre.setGenre(genre);
         userGenre.setUser(user);
         userGenreRepository.save(userGenre);
+
+        UserEntity user2 = new UserEntity();
+        user2.setEmail("test@gmail.com");
+        user2.setPassword(passwordEncoder.encode("test1995@"));
+        user2.setNickname("테스트유저2");
+        user2.setPhoneNumber("010-1111-2222");
+        user2.setUserType("USER");
+        TermsAgreement termsAgreement2 = new TermsAgreement(true,true,true,true,true);
+        user2.setTermsAgreement(termsAgreement2);
+        userRepository.save(user2);
+
+
+        FieldEntity field2 = fieldRepository.findByFieldName("작사").orElseThrow(() -> new RuntimeException("Field not found"));
+
+        UserField userField2 = new UserField();
+        userField2.setUser(user2);
+        userField2.setField(field2);
+        userFieldRepository.save(userField2);
+
+        GenreEntity genre2 = genreRepository.findByGenreName("팝").orElseThrow(() -> new GenreNotFoundException("팝"));
+
+        UserGenre userGenre2 = new UserGenre();
+        userGenre2.setGenre(genre2);
+        userGenre2.setUser(user2);
+        userGenreRepository.save(userGenre2);
     }
 
 }
