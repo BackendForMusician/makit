@@ -28,6 +28,6 @@ public class FeedEntity {
     @Column(length = 2000)
     private String imageUrl;
 
-    @OneToMany(mappedBy = "feed")
+    @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FeedTag> feedTags= new HashSet<>();
 }
