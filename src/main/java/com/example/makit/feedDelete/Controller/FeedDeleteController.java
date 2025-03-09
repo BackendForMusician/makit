@@ -1,5 +1,6 @@
 package com.example.makit.feedDelete.Controller;
 
+import com.example.makit.feedDelete.DTO.DeleteResponseDTO;
 import com.example.makit.feedDelete.Service.FeedDeleteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ public class FeedDeleteController {
     }
 
     @DeleteMapping("/delete/{feedId}")
-    public ResponseEntity<String> deleteFeed(@PathVariable Long feedId) {
+    public ResponseEntity<DeleteResponseDTO> deleteFeed(@PathVariable Long feedId) {
         try {
             feedDeleteService.deleteFeed(feedId);
-            return ResponseEntity.ok("피드가 성공적으로 삭제되었습니다.");
+            return ResponseEntity.ok(new DeleteResponseDTO(true, "피드가 정상적으로 삭제되었습니다."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new DeleteResponseDTO(false, e.getMessage()));
         }
     }
 }

@@ -34,20 +34,14 @@ public class FeedDeleteService {
     private void deleteFileFromS3(String fileUrl) {
         if (fileUrl != null && !fileUrl.isEmpty()) {
             String fileName = extractFileName(fileUrl);
-
-            boolean exists = amazonS3.doesObjectExist(BUCKET_NAME, fileName);
-
-            if (exists) {
-                amazonS3.deleteObject(new DeleteObjectRequest(BUCKET_NAME, fileName));
-            }
+            amazonS3.deleteObject(new DeleteObjectRequest(BUCKET_NAME, fileName));
         }
     }
 
     private String extractFileName(String fileUrl) {
         try {
             URI uri = new URI(fileUrl);
-            String path = uri.getPath();
-            return path.substring(1);
+            return uri.getPath().substring(1);
         } catch (Exception e) {
             throw new RuntimeException("파일 URL 파싱 오류: " + e.getMessage());
         }
