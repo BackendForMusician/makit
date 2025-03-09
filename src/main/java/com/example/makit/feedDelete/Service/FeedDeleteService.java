@@ -1,10 +1,12 @@
 package com.example.makit.feedDelete.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.makit.feedUpload.Entity.FeedEntity;
 import com.example.makit.feedUpload.Repository.FeedRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.net.URI;
 
 @Service
 public class FeedDeleteService {
@@ -23,20 +25,31 @@ public class FeedDeleteService {
         FeedEntity feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 피드를 찾을 수 없습니다."));
 
-
         deleteFileFromS3(feed.getAudioUrl());
         deleteFileFromS3(feed.getImageUrl());
+
         feedRepository.delete(feed);
     }
 
     private void deleteFileFromS3(String fileUrl) {
         if (fileUrl != null && !fileUrl.isEmpty()) {
             String fileName = extractFileName(fileUrl);
-            amazonS3.deleteObject(BUCKET_NAME, fileName);
+
+            boolean exists = amazonS3.doesObjectExist(BUCKET_NAME, fileName);
+
+            if (exists) {
+                amazonS3.deleteObject(new DeleteObjectRequest(BUCKET_NAME, fileName));
+            }
         }
     }
 
     private String extractFileName(String fileUrl) {
-        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        try {
+            URI uri = new URI(fileUrl);
+            String path = uri.getPath();
+            return path.substring(1);
+        } catch (Exception e) {
+            throw new RuntimeException("파일 URL 파싱 오류: " + e.getMessage());
+        }
     }
 }

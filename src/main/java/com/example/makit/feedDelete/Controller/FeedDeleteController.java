@@ -14,6 +14,7 @@ public class FeedDeleteController {
     public FeedDeleteController(FeedDeleteService feedDeleteService) {
         this.feedDeleteService = feedDeleteService;
     }
+
     @DeleteMapping("/delete/{feedId}")
     public ResponseEntity<String> deleteFeed(@PathVariable Long feedId) {
         try {
