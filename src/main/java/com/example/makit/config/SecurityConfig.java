@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers( // 커스텀 필터 -> 시큐리티 필터 순으로 작동하므로 여기선 모든 경로에 대한 permitALL 필요
                                 "/api/email/send",
+                                "/api/project/**",
                                 "/api/feed/**",
                                 "/api/email/resend",
                                 "/api/reset/**",
