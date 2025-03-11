@@ -39,11 +39,6 @@ public class ProjectUploadController {
                     .body(new ProjectUploadResponseDTO(false, "로그인이 필요합니다."));
         }
 
-        if (files == null || files.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ProjectUploadResponseDTO(false, "최소 1개의 파일을 업로드해야 합니다."));
-        }
-
         ProjectUploadResponseDTO response = projectUploadService.saveProject(request, loginMember, files);
 
         if (!response.isSuccess()) {

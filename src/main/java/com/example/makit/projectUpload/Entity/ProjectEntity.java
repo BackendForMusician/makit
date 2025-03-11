@@ -22,12 +22,11 @@ public class ProjectEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     private String title;
     private String description;
-    private boolean isMusician;
 
     @ManyToMany
     @JoinTable(
@@ -53,3 +52,4 @@ public class ProjectEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
+

@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,23 +18,25 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;              // 사용자 ID (DB 자동 생성)
+    private Long id;
 
-    private String email;         // 이메일
-    private String password;      // 비밀번호
-    private String nickname;      // 닉네임
-    private String phoneNumber;   // 전화번호
-    private String userType = "USER"; //유저 권한
-
-    @OneToMany(mappedBy = "user")
-    private Set<UserField> userFields = new HashSet<>(); // 선택한 분야
+    private String email;
+    private String password;
+    private String nickname;
+    private String phoneNumber;
+    private String userType = "USER";
 
     @OneToMany(mappedBy = "user")
-    private Set<UserGenre> userGenres = new HashSet<>(); // 선택한 장르
+    private Set<UserField> userFields = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserGenre> userGenres = new HashSet<>();
 
     @Convert(converter = TermsAgreementConverter.class)
     @Column(name = "terms_agreement_json", columnDefinition = "TEXT")
     private TermsAgreement termsAgreement;
 
-    // 필요한 다른 정보들을 여기에 추가 예정
+    @Column(name = "registration", nullable = false)
+    private boolean registration = false; // 기본값: false (구독하지 않은 사용자)
+
 }

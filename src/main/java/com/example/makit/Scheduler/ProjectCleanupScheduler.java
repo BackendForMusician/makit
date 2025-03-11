@@ -1,27 +1,3 @@
-//package com.example.makit.Scheduler;
-//
-//import com.example.makit.projectUpload.Repository.ProjectRepository;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Component;
-//import java.time.LocalDateTime;
-//import java.time.temporal.ChronoUnit;
-//
-//@Component
-//public class ProjectCleanupScheduler {
-//
-//    private final ProjectRepository projectRepository;
-//
-//    public ProjectCleanupScheduler(ProjectRepository projectRepository) {
-//        this.projectRepository = projectRepository;
-//    }
-//
-//    @Scheduled(cron = "0 0 0 * * ?")  // 매일 자정 실행
-//    public void deleteOldProjects() {
-//        LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
-//        projectRepository.deleteByCreatedAtBefore(twoWeeksAgo);
-//        System.out.println("2주 지난 프로젝트 삭제 완료!");
-//    }
-//}
 package com.example.makit.Scheduler;
 
 import com.amazonaws.services.s3.AmazonS3;
