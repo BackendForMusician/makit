@@ -6,7 +6,8 @@ import com.example.makit.feedUpload.Entity.FeedEntity;
 import com.example.makit.feedUpload.Repository.FeedRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.net.URI;
+import
+        java.net.URI;
 
 @Service
 public class FeedDeleteService {
