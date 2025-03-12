@@ -15,7 +15,6 @@ public class ProjectDeleteController {
     public ProjectDeleteController(ProjectDeleteService projectDeleteService) {
         this.projectDeleteService = projectDeleteService;
     }
-
     @DeleteMapping("/delete/{projectId}")
     public ResponseEntity<DeleteResponseDTO> deleteProject(@PathVariable Long projectId) {
         try {
